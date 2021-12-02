@@ -72,35 +72,6 @@ class Results extends StatelessWidget {
   }
 }
 
-// Common Mynah:
-// •	Looks: A large, black-and-brown myna with white wing patches, yellow bill, and yellow legs.
-// •	Aggressive, often driving away other birds.
-// •	Mostly found on dense forest.
-// •	Native to southern Asia.
-// •	Family: Sturnidae
-// •	Life span: 4 years
-// House Sparrow:
 
-// •	Looks:  Males have smart black bibs, bright rufous napes, and stunningly patterned wings with brilliant buffs and browns.
-// •	Widespread and abundant in cities, neighborhoods and farms
-// •	Avoids dense forest.
-// •	Native to Eurasia.
-// •	Scientific name: Passer domesticus
-// •	Lifespan: 3 years (In the wild)
-// •	Aggressive for nesting sites.
 
-// House Crow:
-// •	Looks: A slender, blackish medium-sized crow with a long bill. 
-// •	feeding on leftover rubbish from humans
-// •	Found in a wide range of habitats mostly around human habitation.
-// •	Their call is a loud and harsh “kaa kaa kaa.”
-// •	Scientific name: Corvus splendens
-// •	Crows can be found all over the world in a variety of habitats. 
-// •	Lifespan: 13 years in the wild 
 
-// class Bird {
-//   final int id;
-//   final String name;
-//   final String image;
-
-// }
