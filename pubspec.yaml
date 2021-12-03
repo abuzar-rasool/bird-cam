@@ -37,6 +37,7 @@ dependencies:
   camera_camera: ^2.0.2
   modal_bottom_sheet: ^2.0.0
   flare_flutter: ^3.0.2
+  loading_indicator: ^3.0.2
   
 
 

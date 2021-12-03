@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:bird_cam/loading_animation.dart';
 import 'package:camera_camera/camera_camera.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:bird_cam/bird.dart';
 import 'package:bird_cam/database.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
 void main() {
   runApp( BirdCam());
@@ -21,7 +24,7 @@ class BirdCam extends StatelessWidget {
         primarySwatch: Colors.brown,
         fontFamily: "SF-Pro-Display"
       ),
-      home: Scaffold(body:  Results()),
+      home: Scaffold(body:  HomeCamera()),
     );
   }
 }
@@ -51,6 +54,7 @@ class Results extends StatelessWidget {
   // final Bird bird;
   Results({Key? key}) : super(key: key);
   Bird b = birds[0];
+  bool loading = true;
   final List<Map<String, dynamic>> _items = List.generate(
       5,
       (index) =>
@@ -59,34 +63,27 @@ class Results extends StatelessWidget {
   final List<String> titles = ["Habitat", "Diet", "Lifespan", "Family", "Interesting Fact"];
   final List<IconData> leading_icons = [Icons.home_rounded, Icons.food_bank, Icons.health_and_safety, Icons.groups, Icons.favorite];
 
-  Widget detailCard (
-    {required Widget child,
-    }) {
-    return Container(
-      width: double.infinity,
-      height: 50,
-      child: child,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            spreadRadius: 1.0,
-            blurRadius: 2.0
-          )
-        ]
-      )
-    ); 
+  Widget loadingWidget () {
+    return Center(
+      child: Container(
+        // height: 300,
+        width: 200,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            LoadingIndicator(
+              indicatorType: Indicator.orbit, /// Required, The loading type of the widget
+            ),
+            SizedBox(height: 10,),
+            Text("Please wait. Running our CNN model...", style: TextStyle(fontSize: 14))
+          ],
+        ),
+      ),
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-    final List<String> b_details = [b.habitat, b.diet, b.lifespan, b.lifespan, b.other];
-
-    return Column(
+  Widget result_content (double screenHeight, List<String> b_details) {
+      return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children:  [
         Container(
@@ -175,6 +172,33 @@ class Results extends StatelessWidget {
           )  
           ],
         );
+    }
+
+    Future getData() async {
+      await Future.delayed(Duration(seconds: 5));
+      return 1;
+    }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    final List<String> b_details = [b.habitat, b.diet, b.lifespan, b.lifespan, b.other];
+
+    return FutureBuilder(
+    future: getData(), // the function to get your data from firebase or firestore
+    builder : (BuildContext context, AsyncSnapshot snap) {
+        if(!snap.hasData){
+            print("loading");
+            return loadingWidget();
+        } 
+        else {
+          print(snap.data);
+          return result_content(screenHeight, b_details);
+        }        
+    }
+);
+    
   }
 }
 
