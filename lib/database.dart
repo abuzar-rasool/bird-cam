@@ -11,6 +11,7 @@ List<Bird> birds =[
     diet: "Insects and seeds",
     lifespan: "4 years (In the wild)",
     family: "Sturnidae",
+    other: "progress",
   ),
   Bird(
     id: 2,
@@ -21,6 +22,7 @@ List<Bird> birds =[
     diet: "Insects and fruit",
     lifespan: "3 years (In the wild)",
     family: "Passeridae",
+    other: "progress",
   ),
   Bird(
     id: 3,
@@ -31,5 +33,6 @@ List<Bird> birds =[
     diet: "Insects and rodents",
     lifespan: "13 years (In the wild)",
     family: "Corvidae",
+    other: "progress",
   ),
 ];
