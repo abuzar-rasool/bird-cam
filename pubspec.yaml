@@ -40,6 +40,7 @@ dependencies:
   loading_indicator: ^3.0.2
   http: ^0.13.4
   
+  
 
 
 dev_dependencies:
@@ -72,6 +73,7 @@ flutter:
       - assets/common_mynah.jpg
       - assets/house_crow.jpg
       - assets/house_sparrow.jpg
+      - assets/loading.flr
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

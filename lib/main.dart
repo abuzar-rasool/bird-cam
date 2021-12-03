@@ -1,16 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:bird_cam/loading_animation.dart';
+import 'package:bird_cam/visualization.dart';
 import 'package:camera_camera/camera_camera.dart';
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:bird_cam/bird.dart';
 import 'package:bird_cam/database.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:http/http.dart' as http;
 
-String url = "http://cc38-34-91-67-109.ngrok.io/classify";
+String url = "http://b962-34-123-250-26.ngrok.io/classify";
 
 void main() {
   runApp(BirdCam());
@@ -24,9 +25,11 @@ class BirdCam extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'BirdCam',
-      theme:
-          ThemeData(primarySwatch: Colors.brown, fontFamily: "SF-Pro-Display"),
-      home: Scaffold(body: HomeCamera()),
+      theme: ThemeData(
+        primarySwatch: Colors.brown,
+        fontFamily: "SF-Pro-Display"
+      ),
+      home: Scaffold(body:  HomeCamera()),
     );
   }
 }
@@ -53,13 +56,11 @@ class _HomeCameraState extends State<HomeCamera> {
 }
 
 class Results extends StatelessWidget {
+  // final Bird bird;
   Results({Key? key, required this.file}) : super(key: key);
-  Bird? b;
   File file;
-  final List<Map<String, dynamic>> _items = List.generate(
-      5,
-      (index) =>
-          {"id": index, "title": "Item $index", "subtitle": "Subtitle $index"});
+  Bird? b;
+  bool loading = true;
 
   final List<String> titles = [
     "Habitat",
@@ -85,23 +86,19 @@ class Results extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           // ignore: prefer_const_literals_to_create_immutables
           children: [
-            const LoadingIndicator(
-              indicatorType: Indicator.orbit,
-
-              /// Required, The loading type of the widget
-            ),
+            LoadingAnimation(isPaused: false),
             const SizedBox(
               height: 10,
             ),
             const Text("Please wait. Running our CNN model...",
-                style: TextStyle(fontSize: 14))
+                style: TextStyle(fontSize: 16))
           ],
         ),
       ),
     );
   }
 
-  Widget resultContent(double screenHeight, List<String?> bDetails) {
+  Widget resultContent(double screenHeight, List<String?> bDetails, context, Map<String, dynamic> result) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -117,8 +114,8 @@ class Results extends StatelessWidget {
                 colorFilter: ColorFilter.mode(
                     Colors.black.withOpacity(0.4), BlendMode.dstATop),
                 fit: BoxFit.cover,
-                image: const AssetImage(
-                  "assets/common_mynah.jpg",
+                image: AssetImage(
+                  b!.image,
                 ),
               )),
           height: screenHeight * 0.3,
@@ -151,13 +148,31 @@ class Results extends StatelessWidget {
         //   mainAxisAlignment: MainAxisAlignment.start,
         //   crossAxisAlignment: CrossAxisAlignment.start,
         //   children: [
-        const Padding(
+        Padding(
           padding: EdgeInsets.symmetric(horizontal: 1.0, vertical: 10.0),
-          child: Text("Details",
-              style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.black54)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Details",
+                  style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black54)),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => Visualization(urls: result,)));
+                },
+                child: Text("More info for geeks",
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black54)),
+              ),
+                      
+            ],
+          ),
         ),
         //       SizedBox(height: 15),
         Expanded(
@@ -200,7 +215,6 @@ class Results extends StatelessWidget {
 
 
   Future<Map<String,dynamic>?> getData(File file) async {
-    Response _response;
     Map<String,dynamic>? _result;
     print('uploading data');
       var uri = Uri.parse(url);
@@ -223,16 +237,10 @@ class Results extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    final List<String?> bDetails = [
-      b?.habitat,
-      b?.diet,
-      b?.lifespan,
-      b?.lifespan,
-      b?.other
-    ];
+    
     return FutureBuilder(
         future: getData(
             file), // the function to get your data from firebase or firestore
@@ -241,13 +249,20 @@ class Results extends StatelessWidget {
             return loadingWidget();
           } else {
             int result =int.parse( snap.data["result"] as String);
-            if (result <= 0) {
+            if (result < 0) {
               return const Center(
                 child: Text("No bird found", style: TextStyle(fontSize: 20)),
               );
             } else {
               b = birds.firstWhere((element) => element.id == result);
-              return resultContent(screenHeight, bDetails);
+              final List<String?> bDetails = [
+                b?.habitat,
+                b?.diet,
+                b?.lifespan,
+                b?.lifespan,
+                b?.other
+              ];
+              return resultContent(screenHeight, bDetails, context, snap.data);
             }
           }
         });
